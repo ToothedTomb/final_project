@@ -1,0 +1,159 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>BSD Operating Systems</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}"> 
+    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.jpeg' %}">
+</head>
+<body>
+    <div style="text-align: right; margin: 10px;">
+        {% if user.is_authenticated %}
+            <span>The user: {{ user.username }}</span>
+            <button onclick="window.location.href='{% url 'logout' %}'">Logout</button>
+        {% else %}
+            <button onclick="window.location.href='{% url 'login' %}'">Login</button>
+            <button onclick="window.location.href='{% url 'signup' %}'">Signup</button>
+        {% endif %}
+    </div>
+    
+    <u><h1>BSD Operating Systems:</h1></u>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <!-- Search Form (visible to all users) -->
+    <form method="GET" action="{% url 'homepage' %}" style="margin-bottom: 20px; display: flex; gap: 10px;">
+        <input type="text" name="search" placeholder="Search by name, package manager, architecture and latest version" value="{{ search_query }}" style="flex-grow: 1;">
+        <button type="submit" style="width: auto;">Search</button>
+        {% if search_query %}
+            <a href="{% url 'homepage' %}" style="color: white; text-decoration: none; padding: 8px 16px; border: 2px solid white; border-radius: 4px;">Clear</a>
+        {% endif %}
+    </form>
+    
+    <!-- Only show "Add OS" button to superuser -->
+    {% if user.is_superuser %}
+        <button onclick="window.location.href='{% url 'create_os' %}'" style="width: auto; margin-bottom: 10px;">Add New OS</button>
+    {% endif %}
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Logo</th>
+                <th>Name</th>
+                <th>Website</th>
+                <th>Package Manager</th>
+                <th>CPU Architecture</th>
+                <th>Latest Version</th>
+                <th>End Of Support</th>
+                {% if user.is_authenticated %}
+                <th>Comment</th>
+                {% endif %}
+                {% if user.is_superuser %}
+                <th>Actions</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in os_data %}
+            <tr>
+                <td>
+                    {% if item.os.logo %}
+                        <img src="{{ item.os.logo.url }}" alt="{{ item.os.name }} logo" style="width: 50px; height: 50px; object-fit: contain;">
+                    {% else %}
+                        <span>No logo</span>
+                    {% endif %}
+                </td>
+                <td>{{ item.os.name }}</td>
+                <td>
+                    {% if item.os.website %}
+                        <a href="{{ item.os.website }}" target="_blank" style="color: white;">Visit Website</a>
+                    {% else %}
+                        <span>N/A</span>
+                    {% endif %}
+                </td>
+                <td>{{ item.os.Package_Manager }}</td>
+                <td>{{ item.os.CPU_Architecture }}</td>
+                <td>{{ item.os.Latest_Version }}</td>
+                <td>{{ item.os.End_Of_Support }}</td>
+                {% if user.is_authenticated %}
+                <td>
+                    {% if item.user_comment %}
+                        <!-- User has a comment - show Update/Delete -->
+                        <div style="display: flex; flex-direction: column; gap: 5px;">
+                            <form method="post" action="{% url 'homepage' %}" style="display: flex; flex-direction: column; gap: 5px; width: 100%; margin: 0;">
+                                {% csrf_token %}
+                                <input type="hidden" name="os_id" value="{{ item.os.id }}">
+                                
+                                <!-- Text entry -->
+                                <div>
+                                    <textarea name="comment_text" rows="3" required style="width: 100%;">{{ item.user_comment.text }}</textarea>
+                                </div>
+                                
+                                <!-- Update button UNDER the comment -->
+                                <div>
+                                    <button type="submit" style="width: auto;">Update</button>
+                                </div>
+                            </form>
+                            
+                            <!-- Delete button (separate form) -->
+                            <form method="post" action="{% url 'delete_comment' item.os.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" style="width: auto;">Delete</button>
+                            </form>
+                        </div>
+                    {% else %}
+                        <!-- User doesn't have a comment - show Add button -->
+                        <div style="display: flex; flex-direction: column; gap: 5px;">
+                            <form method="post" action="{% url 'homepage' %}" style="display: flex; flex-direction: column; gap: 5px; width: 100%; margin: 0;">
+                                {% csrf_token %}
+                                <input type="hidden" name="os_id" value="{{ item.os.id }}">
+                                
+                                <!-- Text entry -->
+                                <div>
+                                    <textarea name="comment_text" rows="3" placeholder="Add comment..." required style="width: 100%;"></textarea>
+                                </div>
+                                
+                                <!-- Add button UNDER the comment -->
+                                <div>
+                                    <button type="submit" style="width: auto;">Add</button>
+                                </div>
+                            </form>
+                        </div>
+                    {% endif %}
+                </td>
+                {% endif %}
+                {% if user.is_superuser %}
+                <td>
+                    <button onclick="window.location.href='{% url 'edit_os' item.os.id %}'" style="width: auto; margin-bottom: 5px;">Edit</button>
+                    <button onclick="window.location.href='{% url 'delete_os' item.os.id %}'" style="width: auto;">Delete</button>
+                </td>
+                {% endif %}
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="{% if user.is_superuser %}9{% elif user.is_authenticated %}8{% else %}7{% endif %}">
+                    {% if search_query %}
+                        Nothing here
+                    {% else %}
+                        No BSD Operating Systems yet.
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <br>
+    <hr style='color: white;'>
+    
+    <p>Developed by Jonathan Steadman.</p>
+</body>
+</html>

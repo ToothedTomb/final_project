@@ -1,0 +1,46 @@
+        body{
+            background-color: #000000; 
+            color:aliceblue;
+            font-family: sans-serif;
+        }
+        /*Style my table with the BSD operating systems data */
+        table{
+            border-collapse: collapse;
+            width:100%;
+        }
+        td, th{
+            border: 1px solid rgb(255, 255, 255);
+            text-align:left;
+            padding: 8px;
+        }
+
+
+        button {
+            border: 2px solid #fffefe;
+            background-color: #000000;
+            color: rgb(255, 255, 255);
+            padding: 8px 16px;
+            cursor: pointer;
+            width:100%;
+            font-size: 20px;
+        }
+       form label{
+        display: block;
+       }
+       form input{
+        background-color: #000000;
+        border: 2px solid #fffefe;
+        color:#fffefe;
+        font-size: 16px;
+        width: 100%;
+       }
+        form input.date-input {
+            box-sizing: border-box;
+            width: 100%;
+        }
+        form ::placeholder{
+            color:#fffefe;
+            font-style: italic;
+        }
+
+        
