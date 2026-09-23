@@ -25,7 +25,7 @@ python3 manage.py runserver
 http://127.0.0.1:8000/bsd-os/
 # Screenshots:
 
-<img width="1920" height="1040" src="https://github.com/user-attachments/assets/59443a91-535c-4f61-9940-a424894e9190" />
+<img width="1920" height="1040" alt="Screenshot from 2026-09-23 18-56-06" src="https://github.com/user-attachments/assets/0bf77d51-059e-46b4-8d14-d7eb1c93808f" />
 
 
 # Version: 
